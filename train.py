@@ -18,7 +18,10 @@ import torchvision
 import numpy as np
 from os import makedirs
 import os
-import wandb
+try:
+    import wandb
+except ImportError:
+    wandb = None
 import time
 import torchvision.transforms.functional as tf
 from PIL import Image
