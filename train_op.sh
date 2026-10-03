@@ -2,7 +2,7 @@
 
 # Path to your Python script
 PYTHON_SCRIPT="./train.py"  
-BASE_DATASET_DIR="../Dataset"
+BASE_DATASET_DIR="./Dataset"
 chkpnt_iter=14999
 declare -a run_scenes=(
   "bicycle"
@@ -48,17 +48,16 @@ run_script(){
   mkdir -p "$OUTPUT_DIR"
   ckpt="$OUTPUT_DIR"/chkpnt"$chkpnt_iter".pth
 
-  gpu_id=$(get_available_gpu)
+  # Jetson does not use nvidia-smi for GPU selection; use the default GPU 0.
+  # gpu_id=$(get_available_gpu)
 
-  if [[ -n $gpu_id ]]; then
-    echo "GPU $gpu_id is available."
-    CUDA_VISIBLE_DEVICES=$gpu_id python "$PYTHON_SCRIPT" \
+  # W&B logging is disabled for local runs.
+  python "$PYTHON_SCRIPT" \
     --port "$PORT" \
     -s="$DATASET_DIR" \
     -m="$OUTPUT_DIR" \
     --eval \
     --iterations "30000"\
-    --use_wandb \
     --target_num "800_000"\
     -i "images_4"
     #--resolution "4"
@@ -66,10 +65,6 @@ run_script(){
     # 
     #--start_checkpoint "$ckpt"
     #--checkpoint_iterations "$chkpnt_iter"
-    else
-      echo "No GPU available at the moment. Retrying in 1 minute."
-      sleep 60
-  fi
 }
 
 for view in "${run_scenes[@]}"; do
